@@ -125,10 +125,10 @@ To verify that your cluster is configured correctly and running, you will instal
 
 The Kubernetes Metrics Server, used to gether metrics such as cluster CPU and memory usage over time, is not deployed by default in EKS clusters.
 
-Deploy the metrics server, which is included in this repo, by running the following command.
+Deploy the metrics server by running the following command.
 
 ```shell
-$ kubectl apply -f metrics-server-0.3.6/deploy/1.8+/
+$ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 ```
 
 Verify that the metrics server has been deployed. If successful, you should see something like this.
@@ -137,12 +137,6 @@ Verify that the metrics server has been deployed. If successful, you should see 
 $ kubectl get deployment metrics-server -n kube-system
 NAME             READY   UP-TO-DATE   AVAILABLE   AGE
 metrics-server   1/1     1            1           4s
-```
-
-Sidenote: the source for the metrics server was retrieved with the following command:
-
-```shell
-$ wget -O v0.3.6.tar.gz https://codeload.github.com/kubernetes-sigs/metrics-server/tar.gz/v0.3.6 && tar -xzf v0.3.6.tar.gz
 ```
 
 ### Deploy Kubernetes Dashboard
@@ -211,3 +205,7 @@ Select "Token" on the Dashboard UI then copy and paste the entire token you
 receive into the 
 [dashboard authentication screen](http://127.0.0.1:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/) 
 to sign in. You are now signed in to the dashboard for your Kubernetes cluster.
+
+## Clean up your workspace
+
+After you have explored the EKS cluster and the Kubernetes dashboard, clean up your AWS resources by running `terraform destroy`
