@@ -1,22 +1,20 @@
 # Learn Terraform - Provision an EKS Cluster
 
-This repo is a companion repo to the [Provision an EKS Cluster learn guide](https://learn.hashicorp.com/terraform/kubernetes/provision-eks-cluster), containing
-Terraform configuration files to provision an EKS cluster on AWS.
+This repo is forked from the [HashiCorp repo of the same name](https://github.com/hashicorp/learn-terraform-provision-eks-cluster), which also provides a tutorial: [Provision an EKS Cluster learn guide](https://learn.hashicorp.com/terraform/kubernetes/provision-eks-cluster).
 
-After installing the AWS CLI. Configure it to use your credentials.
+## Setup AWS
 
-```shell
-$ aws configure
-AWS Access Key ID [None]: <YOUR_AWS_ACCESS_KEY_ID>
-AWS Secret Access Key [None]: <YOUR_AWS_SECRET_ACCESS_KEY>
-Default region name [None]: <YOUR_AWS_REGION>
-Default output format [None]: json
-```
+! NOTE: running EKS does incur a small cost of $0.10 per hour, be sure to destroy all resources when finished !
 
-This enables Terraform access to the configuration file and performs operations on your behalf with these security credentials.
+Setup the AWS CLI, and configure it to use your credentials. For more details see the official AWS documentation (CLI is also available on package managers such as homebrew). Ensure your user has the roles listed in the [Terraform EKS module documentation](https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/iam-permissions.md); one easy way to do this is with the AdministratorAccess AWS managed policy.
 
-After you've done this, initalize your Terraform workspace, which will download 
-the provider and initialize it with the values provided in the `terraform.tfvars` file.
+If you have multiple profiles, use an environment variable to select the one you wish to use: `export AWS_PROFILE=<profile-name>`
+
+Terraform will automatically use the AWS configuration file and perform operations on your behalf with these security credentials.
+
+## Initialize Terraform workspace and apply state
+
+The following script will download the provider and initialize it with the values provided in the `terraform.tfvars` file.
 
 ```shell
 $ terraform init
@@ -125,16 +123,9 @@ To verify that your cluster is configured correctly and running, you will instal
 
 ### Deploy Kubernetes Metrics Server
 
-The Kubernetes Metrics Server, used to gether metrics such as cluster CPU and memory usage
-over time, is not deployed by default in EKS clusters.
+The Kubernetes Metrics Server, used to gether metrics such as cluster CPU and memory usage over time, is not deployed by default in EKS clusters.
 
-Download and unzip the metrics server by running the following command.
-
-```shell
-$ wget -O v0.3.6.tar.gz https://codeload.github.com/kubernetes-sigs/metrics-server/tar.gz/v0.3.6 && tar -xzf v0.3.6.tar.gz
-```
-
-Deploy the metrics server to the cluster by running the following command.
+Deploy the metrics server, which is included in this repo, by running the following command.
 
 ```shell
 $ kubectl apply -f metrics-server-0.3.6/deploy/1.8+/
@@ -146,6 +137,12 @@ Verify that the metrics server has been deployed. If successful, you should see 
 $ kubectl get deployment metrics-server -n kube-system
 NAME             READY   UP-TO-DATE   AVAILABLE   AGE
 metrics-server   1/1     1            1           4s
+```
+
+Sidenote: the source for the metrics server was retrieved with the following command:
+
+```shell
+$ wget -O v0.3.6.tar.gz https://codeload.github.com/kubernetes-sigs/metrics-server/tar.gz/v0.3.6 && tar -xzf v0.3.6.tar.gz
 ```
 
 ### Deploy Kubernetes Dashboard
